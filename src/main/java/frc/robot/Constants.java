@@ -45,6 +45,21 @@ public final class Constants {
     public static final double LAUNCHING_LAUNCHER_VOLTAGE = 10.6;
     public static final double SPIN_UP_FEEDER_VOLTAGE = -6;
     public static final double SPIN_UP_SECONDS = 1;
+    // Encoder configuration for Through Bore / alternate encoders attached to
+    // the SPARK MAX data port. Set to true to use the Absolute encoder adapter
+    // (REV-11-3326) and read absolute position. Set to false to use the
+    // Alternate (quadrature) adapter (REV-11-1881) as an incremental encoder.
+    public static final boolean USE_ABSOLUTE_ENCODER = true;
+
+    // Zero offsets (rotations) to apply when using absolute encoders. Tune
+    // these values to align the mechanical zero with your code's reference.
+    public static final double FEEDER_ABS_ZERO_OFFSET = 0.0;
+    public static final double INTAKE_ABS_ZERO_OFFSET = 0.0;
+
+    // Counts-per-revolution to provide when creating an alternate (quadrature)
+    // encoder. REV recommends 4096 for many through-bore setups; change if
+    // you have a different adapter or gearing.
+    public static final int ALTERNATE_ENCODER_CPR = 4096;
   }
 
   public static final class OperatorConstants {

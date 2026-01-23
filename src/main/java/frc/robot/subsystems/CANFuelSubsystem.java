@@ -20,31 +20,27 @@ public class CANFuelSubsystem extends SubsystemBase {
   private Object feederEncoder = null;
   private Object intakeEncoder = null;
 
-  /** Creates a new CANBallSubsystem. */
+  /** Crea un nuevo subsistema de fuel (rodillos). */
   public CANFuelSubsystem() {
-    // create brushed motors for each of the motors on the launcher mechanism
+    // Crear controladores para los motores brushed del mecanismo de fuel
     intakeLauncherRoller = new SparkMax(INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushed);
     feederRoller = new SparkMax(FEEDER_MOTOR_ID, MotorType.kBrushed);
 
-    // put default values for various fuel operations onto the dashboard
-    // all methods in this subsystem pull their values from the dashbaord to allow
-    // you to tune the values easily, and then replace the values in Constants.java
-    // with your new values. For more information, see the Software Guide.
+    // Publicar valores por defecto en el Dashboard para poder ajustarlos en
+    // tiempo de ejecución y tunear sin recompilar.
     SmartDashboard.putNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE);
     SmartDashboard.putNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE);
     SmartDashboard.putNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE);
     SmartDashboard.putNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE);
     SmartDashboard.putNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
 
-    // create the configuration for the feeder roller, set a current limit and apply
-    // the config to the controller
+    // Configurar el feeder: limitar corriente y aplicar configuración al motor
     SparkMaxConfig feederConfig = new SparkMaxConfig();
     feederConfig.smartCurrentLimit(FEEDER_MOTOR_CURRENT_LIMIT);
     feederRoller.configure(feederConfig, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
 
-    // create the configuration for the launcher roller, set a current limit, set
-    // the motor to inverted so that positive values are used for both intaking and
-    // launching, and apply the config to the controller
+    // Configurar el motor del lanzador: invertir según sea necesario y limitar
+    // corriente, luego aplicar la configuración.
     SparkMaxConfig launcherConfig = new SparkMaxConfig();
     launcherConfig.inverted(true);
     launcherConfig.smartCurrentLimit(LAUNCHER_MOTOR_CURRENT_LIMIT);
@@ -118,15 +114,14 @@ public class CANFuelSubsystem extends SubsystemBase {
     }
   }
 
-  // A method to set the rollers to values for intaking
+  // Establece valores para intaking (recoger fuel)
   public void intake() {
     feederRoller.setVoltage(SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
     intakeLauncherRoller
         .setVoltage(SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
-  // A method to set the rollers to values for ejecting fuel out the intake. Uses
-  // the same values as intaking, but in the opposite direction.
+  // Establece valores para expulsar fuel (modo inverso al intake)
   public void eject() {
     feederRoller
         .setVoltage(-1 * SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
@@ -134,21 +129,20 @@ public class CANFuelSubsystem extends SubsystemBase {
         .setVoltage(-1 * SmartDashboard.getNumber("Intaking launcher roller value", INTAKING_INTAKE_VOLTAGE));
   }
 
-  // A method to set the rollers to values for launching.
+  // Establece valores para lanzar fuel (modo lanzamiento)
   public void launch() {
     feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
     intakeLauncherRoller
         .setVoltage(SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE));
   }
 
-  // A method to stop the rollers
+  // Detiene los rodillos
   public void stop() {
     feederRoller.set(0);
     intakeLauncherRoller.set(0);
   }
 
-  // A method to spin up the launcher roller while spinning the feeder roller to
-  // push Fuel away from the launcher
+  // Enciende el lanzador y hace girar el feeder para preparar el disparo
   public void spinUp() {
     feederRoller
         .setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE));
@@ -156,14 +150,12 @@ public class CANFuelSubsystem extends SubsystemBase {
         .setVoltage(SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE));
   }
 
-  // A command factory to turn the spinUp method into a command that requires this
-  // subsystem
+  // Fabrica un comando que ejecuta spinUp mientras requiere este subsistema
   public Command spinUpCommand() {
     return this.run(() -> spinUp());
   }
 
-  // A command factory to turn the launch method into a command that requires this
-  // subsystem
+  // Fabrica un comando que ejecuta launch mientras requiere este subsistema
   public Command launchCommand() {
     return this.run(() -> launch());
   }

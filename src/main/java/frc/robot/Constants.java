@@ -5,14 +5,11 @@
 package frc.robot;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean constants. This class should not be used for any other
- * purpose. All constants should be declared globally (i.e. public static). Do
- * not put anything functional in this class.
+ * Clase de constantes del robot. Aquí se definen valores numéricos y booleanos
+ * usados en todo el proyecto (IDs, límites, escalados, offsets, etc.). No
+ * coloques lógica ejecutable en esta clase, sólo datos.
  *
- * <p>
- * It is advised to statically import this class (or one of its inner classes)
- * wherever the constants are needed, to reduce verbosity.
+ * Se recomienda importar estáticamente las constantes cuando se usen.
  */
 public final class Constants {
   public static final class DriveConstants {
@@ -72,5 +69,11 @@ public final class Constants {
     // help avoid driving and turning too fast and being difficult to control
     public static final double DRIVE_SCALING = .7;
     public static final double ROTATION_SCALING = .8;
+    // Open-loop turn parameters for a 180° turn when no gyro is available.
+    // These are approximate and should be tuned on the robot. TURN_180_SPEED is
+    // the rotation input (0..1) applied during the turn; TURN_180_TIME is the
+    // duration in seconds to run that rotation to approximate 180°.
+    public static final double TURN_180_SPEED = 0.6;
+    public static final double TURN_180_TIME = 1.6;
   }
 }

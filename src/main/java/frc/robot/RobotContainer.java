@@ -16,11 +16,10 @@ import frc.robot.subsystems.CANDriveSubsystem;
 import frc.robot.subsystems.CANFuelSubsystem;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a "declarative" paradigm, very little robot logic should
- * actually be handled in the {@link Robot} periodic methods (other than the
- * scheduler calls). Instead, the structure of the robot (including subsystems,
- * commands, and trigger mappings) should be declared here.
+ * Contiene la mayoría de las declaraciones del robot: subsistemas, comandos y
+ * mapeos de botones. En el enfoque Command-based la lógica de ejecución se
+ * organiza declarativamente, por lo que aquí sólo se construyen y conectan
+ * las piezas del robot.
  */
 public class RobotContainer {
   // The robot's subsystems
@@ -47,38 +46,35 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your trigger->command mappings. Triggers can be
-   * created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)}
-   * constructor with an arbitrary predicate, or via the named factories in
-   * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses
-   * for {@link CommandXboxController Xbox}/
-   * {@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick 
+   * Define los mapeos de disparadores->comandos (botones -> acciones).
+   * Se usan {@link Trigger} con predicados sobre el HID para activar comandos.
    */
   private void configureBindings() {
 
-    // Button 2 (Thumb): Intake Fuel
+  // Botón 2 (pulgar): activar intake (recoger fuel)
     new Trigger(() -> driverJoystick.getRawButton(2))
         .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(), () -> ballSubsystem.stop()));
 
-    // Trigger (Button 1): Spin up and launch
-    // Uses spinUpCommand + launchCommand combination
+  // Gatillo (Botón 1): hacer spin up y luego lanzar
+  // Combina spinUpCommand y launchCommand
     new Trigger(driverJoystick::getTrigger)
         .whileTrue(ballSubsystem.spinUpCommand().withTimeout(SPIN_UP_SECONDS)
             .andThen(ballSubsystem.launchCommand())
             .finallyDo(() -> ballSubsystem.stop()));
 
-    // Button 3 (Top): Eject fuel
+  // Botón 3 (parte superior): expulsar fuel (feeder inverso)
     new Trigger(() -> driverJoystick.getRawButton(3))
         .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
 
-    // Set the default command for the drive subsystem to the command provided by
-    // factory with the values provided by the joystick axes on the driver
-    // controller. The Y axis of the controller is inverted so that pushing the
-    // stick away from you (a negative value) drives the robot forwards (a positive
-    // value). The Z-axis (twist/rotation) is also inverted so a positive value 
-    // (stick rotated clockwise) results in clockwise rotation (front of the robot 
-    // turning right). Both axes are also scaled so movement is more controllable.
+  // Button 4: open-loop 180° turn to the right (timed). This is approximate
+  // — tune TURN_180_SPEED and TURN_180_TIME in Constants.OperatorConstants.
+  new Trigger(() -> driverJoystick.getRawButton(4))
+    .onTrue(driveSubsystem.driveArcade(() -> 0.0, () -> TURN_180_SPEED).withTimeout(TURN_180_TIME));
+
+  // Establece el comando por defecto del subsistema de conducción usando
+  // los ejes del joystick. El eje Y se invierte para que empujar hacia
+  // adelante avance el robot. El eje Z controla la rotación. Se aplican
+  // escalados para que el manejo sea más suave.
     driveSubsystem.setDefaultCommand(
         driveSubsystem.driveArcade(
             () -> -driverJoystick.getY() * DRIVE_SCALING,

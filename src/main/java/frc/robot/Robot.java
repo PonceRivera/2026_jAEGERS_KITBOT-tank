@@ -11,13 +11,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the
- * name of this class or
- * the package after creating this project, you must also update the
- * build.gradle file in the
- * project.
+ * Clase principal del robot: el framework llama automáticamente a los métodos
+ * correspondientes a cada modo (init/periodic). Si cambias el nombre de esta
+ * clase o del paquete, actualiza también la configuración de compilación.
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -25,40 +21,27 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
 
   /**
-   * This function is run when the robot is first started up and should be used
-   * for any
-   * initialization code.
+   * Se ejecuta cuando el robot arranca y debe usarse para inicializaciones.
    */
   @Override
   public void robotInit() {
-    // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our
-    // autonomous chooser on the dashboard.
+  // Crea RobotContainer: registra mapeos de botones y muestra el selector de
+  // modo autónomo en el dashboard.
     m_robotContainer = new RobotContainer();
 
-    // Used to track usage of Kitbot code, please do not remove.
+  // Registro de uso del framework (no eliminar).
     HAL.report(tResourceType.kResourceType_Framework, 10);
   }
 
   /**
-   * This function is called every 20 ms, no matter the mode. Use this for items
-   * like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>
-   * This runs after the mode specific periodic functions, but before LiveWindow
-   * and
-   * SmartDashboard integrated updating.
+   * Se llama cada 20 ms en todos los modos. Úsalo para diagnósticos o tareas
+   * periódicas globales que deben ejecutarse siempre.
    */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler. This is responsible for polling buttons, adding
-    // newly-scheduled
-    // commands, running already-scheduled commands, removing finished or
-    // interrupted commands,
-    // and running subsystem periodic() methods. This must be called from the
-    // robot's periodic
-    // block in order for anything in the Command-based framework to work.
+  // Ejecuta el Scheduler: comprueba botones, programa/completa comandos y
+  // llama a los periodic() de los subsistemas. Debe llamarse desde
+  // robotPeriodic para que el framework Command-based funcione.
     CommandScheduler.getInstance().run();
   }
 

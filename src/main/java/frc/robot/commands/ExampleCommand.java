@@ -7,35 +7,38 @@ package frc.robot.commands;
 import frc.robot.subsystems.CANDriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/** An example command that uses an example subsystem. */
+/**
+ * Comando ejemplo que usa el subsistema de conducción. Manténlo como plantilla
+ * para crear comandos reales.
+ */
 public class ExampleCommand extends Command {
   @SuppressWarnings("PMD.UnusedPrivateField")
   private final CANDriveSubsystem m_subsystem;
 
   /**
-   * Creates a new ExampleCommand.
+   * Crea un nuevo ExampleCommand.
    *
-   * @param subsystem The subsystem used by this command.
+   * @param subsystem Subsistema que usa este comando.
    */
   public ExampleCommand(CANDriveSubsystem subsystem) {
     m_subsystem = subsystem;
-    // Use addRequirements() here to declare subsystem dependencies.
+    // Declara las dependencias del subsistema.
     addRequirements(subsystem);
   }
 
-  // Called when the command is initially scheduled.
+  // Se llama cuando el comando se programa inicialmente.
   @Override
   public void initialize() {}
 
-  // Called every time the scheduler runs while the command is scheduled.
+  // Se llama cada vez que el scheduler ejecuta este comando.
   @Override
   public void execute() {}
 
-  // Called once the command ends or is interrupted.
+  // Se llama una vez que el comando termina o es interrumpido.
   @Override
   public void end(boolean interrupted) {}
 
-  // Returns true when the command should end.
+  // Devuelve true cuando el comando debe finalizar.
   @Override
   public boolean isFinished() {
     return false;

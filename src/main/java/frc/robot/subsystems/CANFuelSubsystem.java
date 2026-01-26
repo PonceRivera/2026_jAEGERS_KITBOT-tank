@@ -37,12 +37,15 @@ public class CANFuelSubsystem extends SubsystemBase {
     // Configurar el feeder: limitar corriente y aplicar configuración al motor
     SparkMaxConfig feederConfig = new SparkMaxConfig();
     feederConfig.smartCurrentLimit(FEEDER_MOTOR_CURRENT_LIMIT);
-    feederRoller.configure(feederConfig, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
+  // Make motor 6 (feederRoller) inverted per user request
+  feederConfig.inverted(true);
+  feederRoller.configure(feederConfig, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
 
     // Configurar el motor del lanzador: invertir según sea necesario y limitar
     // corriente, luego aplicar la configuración.
-    SparkMaxConfig launcherConfig = new SparkMaxConfig();
-    launcherConfig.inverted(true);
+  SparkMaxConfig launcherConfig = new SparkMaxConfig();
+  // Make motor 5 (intakeLauncherRoller) not inverted per user request
+  launcherConfig.inverted(false);
     launcherConfig.smartCurrentLimit(LAUNCHER_MOTOR_CURRENT_LIMIT);
     intakeLauncherRoller.configure(launcherConfig, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters);
 
@@ -77,13 +80,12 @@ public class CANFuelSubsystem extends SubsystemBase {
             Method setZero2 = intakeEncoder.getClass().getMethod("setZeroOffset", double.class);
             setZero2.invoke(intakeEncoder, INTAKE_ABS_ZERO_OFFSET);
           } catch (NoSuchMethodException ignored) {
-            // It's fine if the method doesn't exist on this API version
           }
         }
       }
 
       if (feederEncoder == null) {
-        // Try alternate encoder form: getAlternateEncoder(Type, int)
+  
         Method altMethod = null;
         for (Method m : sparkClass.getMethods()) {
           if (m.getName().equals("getAlternateEncoder")) {
@@ -116,24 +118,54 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   // Establece valores para intaking (recoger fuel)
   public void intake() {
-    feederRoller.setVoltage(SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
-    intakeLauncherRoller
-        .setVoltage(SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
+    // Only run motor 5 (intakeLauncherRoller) for intake — motor 6 is feeder only
+    double intakeV = SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE);
+    SmartDashboard.putString("FuelMode", "intake");
+    SmartDashboard.putNumber("Fuel.IntakeVoltage", intakeV);
+    intakeLauncherRoller.setVoltage(clampVoltage(intakeV));
   }
 
-  // Establece valores para expulsar fuel (modo inverso al intake)
+  // Start/stop control for individual motors so buttons can control them
+  public void startIntakeMotor() {
+    double intakeV = SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE);
+    SmartDashboard.putString("FuelMode", "intake_single");
+    SmartDashboard.putNumber("Fuel.IntakeVoltage", intakeV);
+    intakeLauncherRoller.setVoltage(clampVoltage(intakeV));
+  }
+
+  public void stopIntakeMotor() {
+    intakeLauncherRoller.set(0);
+  }
+
+  public void startFeederMotor() {
+    double feederV = SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE);
+    SmartDashboard.putString("FuelMode", "feeder_single");
+    SmartDashboard.putNumber("Fuel.FeederVoltage", feederV);
+    feederRoller.setVoltage(clampVoltage(feederV));
+  }
+
+  public void stopFeederMotor() {
+    feederRoller.set(0);
+  }
+
+  // Establece valores para expulsar fuel
   public void eject() {
-    feederRoller
-        .setVoltage(-1 * SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
-    intakeLauncherRoller
-        .setVoltage(-1 * SmartDashboard.getNumber("Intaking launcher roller value", INTAKING_INTAKE_VOLTAGE));
+    // Eject (reverse intake) should act only on motor 5 (intakeLauncherRoller)
+    double intakeV = -1 * SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE);
+    SmartDashboard.putString("FuelMode", "eject");
+    SmartDashboard.putNumber("Fuel.IntakeVoltage", intakeV);
+    intakeLauncherRoller.setVoltage(clampVoltage(intakeV));
   }
 
   // Establece valores para lanzar fuel (modo lanzamiento)
   public void launch() {
-    feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
-    intakeLauncherRoller
-        .setVoltage(SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE));
+    double feederV = SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE);
+    double intakeV = SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE);
+    SmartDashboard.putString("FuelMode", "launch");
+    SmartDashboard.putNumber("Fuel.FeederVoltage", feederV);
+    SmartDashboard.putNumber("Fuel.IntakeVoltage", intakeV);
+    feederRoller.setVoltage(clampVoltage(feederV));
+    intakeLauncherRoller.setVoltage(clampVoltage(intakeV));
   }
 
   // Detiene los rodillos
@@ -144,10 +176,24 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   // Enciende el lanzador y hace girar el feeder para preparar el disparo
   public void spinUp() {
-    feederRoller
-        .setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE));
-    intakeLauncherRoller
-        .setVoltage(SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE));
+    double feederV = SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
+    double intakeV = SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE);
+    SmartDashboard.putString("FuelMode", "spinUp");
+    SmartDashboard.putNumber("Fuel.FeederVoltage", feederV);
+    SmartDashboard.putNumber("Fuel.IntakeVoltage", intakeV);
+    feederRoller.setVoltage(clampVoltage(feederV));
+    intakeLauncherRoller.setVoltage(clampVoltage(intakeV));
+  }
+
+  // Clamp voltages to a safe range (SPARK MAX accepts voltages roughly -12..12).
+  private double clampVoltage(double volts) {
+    if (Double.isNaN(volts))
+      return 0.0;
+    if (volts > 12.0)
+      return 12.0;
+    if (volts < -12.0)
+      return -12.0;
+    return volts;
   }
 
   // Fabrica un comando que ejecuta spinUp mientras requiere este subsistema
@@ -184,7 +230,6 @@ public class CANFuelSubsystem extends SubsystemBase {
       if (res instanceof Number)
         return ((Number) res).doubleValue();
     } catch (Exception e) {
-      // ignore and return NaN
     }
     return Double.NaN;
   }
@@ -206,6 +251,5 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
   }
 }

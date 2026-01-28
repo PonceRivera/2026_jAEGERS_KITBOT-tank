@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import static frc.robot.Constants.OperatorConstants.*;
 import static frc.robot.Constants.FuelConstants.*;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.CANDriveSubsystem;
 import frc.robot.subsystems.CANFuelSubsystem;
+import frc.robot.subsystems.MyKitBot;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -25,11 +25,13 @@ import frc.robot.subsystems.CANFuelSubsystem;
 public class RobotContainer {
   // The robot's subsystems
   private final CANDriveSubsystem driveSubsystem = new CANDriveSubsystem();
-  private final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem();
+  //private final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem();
+  private final MyKitBot myKitBot = new MyKitBot();
 
   // The driver's controller
   private final edu.wpi.first.wpilibj.Joystick driverJoystick = new edu.wpi.first.wpilibj.Joystick(
       DRIVER_CONTROLLER_PORT);
+    
 
   // The autonomous chooser
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -43,7 +45,7 @@ public class RobotContainer {
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption
-    autoChooser.setDefaultOption("Autonomous", Autos.exampleAuto(driveSubsystem, ballSubsystem));
+    //autoChooser.setDefaultOption("Autonomous", Autos.exampleAuto(driveSubsystem, ballSubsystem));
   }
 
   /**
@@ -57,22 +59,23 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-  // Button 1: Eject (motor 5 reversed)
-  new Trigger(() -> driverJoystick.getRawButton(1))
-    .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stopIntakeMotor()));
-
-  // Button 7: Intake (motor 5 forward)
-  new Trigger(() -> driverJoystick.getRawButton(7))
-    .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.startIntakeMotor(), () -> ballSubsystem.stopIntakeMotor()));
-
-  // Button 8: Feeder (motor 6) - used for feeding shooter
-  new Trigger(() -> driverJoystick.getRawButton(8))
-    .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.startFeederMotor(), () -> ballSubsystem.stopFeederMotor()));
-
-  // Button 4: open-loop 180° turn to the right (timed). This is approximate
-  // — tune TURN_180_SPEED and TURN_180_TIME in Constants.OperatorConstants.
   new Trigger(() -> driverJoystick.getRawButton(4))
     .onTrue(driveSubsystem.driveArcade(() -> 0.0, () -> TURN_180_SPEED).withTimeout(TURN_180_TIME));
+
+    new Trigger(() -> driverJoystick.getRawButton(1))
+      .whileTrue(myKitBot.Disparo());
+
+    new Trigger(() -> driverJoystick.getRawButton(12))
+      .whileTrue(myKitBot.Disparo2());
+
+    new Trigger(() -> driverJoystick.getRawButton(11))
+      .onTrue(myKitBot.DisparoOFF());
+
+    new Trigger(() -> driverJoystick.getRawButton(8))
+      .whileTrue(myKitBot.Take2());
+
+    new Trigger(() -> driverJoystick.getRawButton(7))
+      .onTrue(myKitBot.TakeOFF());
 
     // Set the default command for the drive subsystem to the command provided by
     // factory with the values provided by the joystick axes on the driver
@@ -84,7 +87,7 @@ public class RobotContainer {
     driveSubsystem.setDefaultCommand(
         driveSubsystem.driveArcade(
             () -> -driverJoystick.getY() * DRIVE_SCALING,
-            () -> -driverJoystick.getZ() * ROTATION_SCALING));
+            () -> -driverJoystick.getX() * ROTATION_SCALING));
   }
 
   /**

@@ -40,16 +40,16 @@ public class CANDriveSubsystem extends SubsystemBase {
   );
 
   public CANDriveSubsystem() {
-     m_motor_neo3.setInverted(true);
-     m_motor_neo4.setInverted(true);
+    //  m_motor_neo3.setInverted(true);
+    //  m_motor_neo4.setInverted(true);
   }
 
-  /** Manejo arcade (fwd = adelante/atrás, rot = giro). */
+  
   public void arcadeDrive(double fwd, double rot) {
     m_drive.arcadeDrive(fwd, rot);
   }
 
-  /** Devuelve un Command que maneja arcade usando ejes del joystick en vivo. */
+
   public Command driveArcade(DoubleSupplier fwd, DoubleSupplier rot) {
     return Commands.run(() -> arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()), this);
   }

@@ -59,23 +59,29 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-  new Trigger(() -> driverJoystick.getRawButton(4))
-    .onTrue(driveSubsystem.driveArcade(() -> 0.0, () -> TURN_180_SPEED).withTimeout(TURN_180_TIME));
+    new Trigger(() -> driverJoystick.getRawButton(4))
+    .whileTrue(driveSubsystem.driveArcade(() -> 0.0, () -> TURN_180_SPEED).withTimeout(TURN_180_TIME));
 
     new Trigger(() -> driverJoystick.getRawButton(1))
       .whileTrue(myKitBot.Disparo());
 
     new Trigger(() -> driverJoystick.getRawButton(12))
-      .whileTrue(myKitBot.Disparo2());
+      .whileTrue(myKitBot.TakeOUT());
 
     new Trigger(() -> driverJoystick.getRawButton(11))
-      .onTrue(myKitBot.DisparoOFF());
+      .whileTrue(myKitBot.DisparoOFF());
 
     new Trigger(() -> driverJoystick.getRawButton(8))
       .whileTrue(myKitBot.Take2());
 
     new Trigger(() -> driverJoystick.getRawButton(7))
       .onTrue(myKitBot.TakeOFF());
+      
+      //new Trigger(() -> driverJoystick.getRawButton(8))
+      //.whileTrue(myKitBot.TakeOUT());
+
+
+
 
     // Set the default command for the drive subsystem to the command provided by
     // factory with the values provided by the joystick axes on the driver
@@ -86,8 +92,8 @@ public class RobotContainer {
     // turning right). Both axes are also scaled so movement is more controllable.
     driveSubsystem.setDefaultCommand(
         driveSubsystem.driveArcade(
-            () -> -driverJoystick.getY() * DRIVE_SCALING,
-            () -> -driverJoystick.getX() * ROTATION_SCALING));
+            () -> -driverJoystick.getZ() * DRIVE_SCALING,
+            () -> -driverJoystick.getY() * ROTATION_SCALING));
   }
 
   /**

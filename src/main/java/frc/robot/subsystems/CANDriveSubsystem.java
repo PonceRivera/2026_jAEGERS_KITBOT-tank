@@ -6,10 +6,13 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,19 +32,43 @@ public class CANDriveSubsystem extends SubsystemBase {
   private final SparkMax m_motor_neo4 = new SparkMax(kCanID_neo4, kMotorType_neo);
 
   private final DifferentialDrive m_drive = new DifferentialDrive(
-    (double speed) -> {
-      m_motor_neo1.set(speed);
-      m_motor_neo2.set(speed);
-    },
-    (double speed) -> {
-      m_motor_neo3.set(speed);
-      m_motor_neo4.set(speed);
-    }
+      m_motor_neo1,
+      m_motor_neo3
   );
 
   public CANDriveSubsystem() {
-    //  m_motor_neo3.setInverted(true);
-    //  m_motor_neo4.setInverted(true);
+    SparkMaxConfig config = new SparkMaxConfig();
+    SparkMaxConfig config2 = new SparkMaxConfig();
+    SparkMaxConfig config3 = new SparkMaxConfig();
+    
+
+    config
+    .inverted(true)
+    .idleMode(IdleMode.kBrake);
+    config.encoder
+    .positionConversionFactor(1000)
+    .velocityConversionFactor(1000);
+    config.closedLoop
+    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+    .pid(1.0, 0.0, 0.0); 
+
+    config2
+    .inverted(false)
+    .idleMode(IdleMode.kBrake);
+    
+    config3
+    .inverted(false)
+    .idleMode(IdleMode.kBrake);
+    
+
+    config2.follow(kCanID_neo1);
+    config3.follow(kCanID_neo3);
+
+    m_motor_neo1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_motor_neo2.configure(config2, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_motor_neo3.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_motor_neo4.configure(config3, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_drive.setSafetyEnabled(false);
   }
 
   

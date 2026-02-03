@@ -67,7 +67,7 @@ public final class Constants {
 
     // This value is multiplied by the joystick value when driving the robot to
     // help avoid driving and turning too fast and being difficult to control
-    public static final double DRIVE_SCALING = 1;
+    public static final double DRIVE_SCALING = 0.6;
     public static final double ROTATION_SCALING = 1;
     // Open-loop turn parameters for a 180° turn when no gyro is available.
     // These are approximate and should be tuned on the robot. TURN_180_SPEED is

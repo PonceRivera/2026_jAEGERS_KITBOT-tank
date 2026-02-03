@@ -31,10 +31,11 @@ public class CANFuelSubsystem extends SubsystemBase {
   /** Crea un nuevo subsistema de fuel (rodillos). */
   public CANFuelSubsystem() {
   // Crear controladores para el mecanismo de fuel:
-  // - motor 5 (INTAKE_LAUNCHER_MOTOR_ID) es brushless (launcher/intake)
-  // - motor 6 (FEEDER_MOTOR_ID) es brushed (feeder)
-  intakeLauncherRoller = new SparkMax(INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushed);
-  feederRoller = new SparkMax(FEEDER_MOTOR_ID, MotorType.kBrushed);
+    // - motor 5 (INTAKE_LAUNCHER_MOTOR_ID) es brushless (launcher/intake)
+    // - motor 6 (FEEDER_MOTOR_ID) es brushless (feeder)
+    // Use kBrushless for NEO motors
+    intakeLauncherRoller = new SparkMax(INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
+    feederRoller = new SparkMax(FEEDER_MOTOR_ID, MotorType.kBrushed);
 
     // Publicar valores por defecto en el Dashboard para poder ajustarlos en
     // tiempo de ejecución y tunear sin recompilar.

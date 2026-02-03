@@ -5,10 +5,12 @@
 package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
+import java.lang.reflect.Method;
 
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -30,6 +32,11 @@ public class CANDriveSubsystem extends SubsystemBase {
   private final SparkMax m_motor_neo2 = new SparkMax(kCanID_neo2, kMotorType_neo);
   private final SparkMax m_motor_neo3 = new SparkMax(kCanID_neo3, kMotorType_neo);
   private final SparkMax m_motor_neo4 = new SparkMax(kCanID_neo4, kMotorType_neo);
+  
+  private Object encoder1 = null;
+  private Object encoder2 = null;
+  private Object encoder3 = null;
+  private Object encoder4 = null;
 
   private final DifferentialDrive m_drive = new DifferentialDrive(
       m_motor_neo1,
@@ -69,6 +76,49 @@ public class CANDriveSubsystem extends SubsystemBase {
     m_motor_neo3.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_motor_neo4.configure(config3, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_drive.setSafetyEnabled(false);
+    try {
+      Method getEnc = m_motor_neo1.getClass().getMethod("getEncoder");
+      encoder1 = getEnc.invoke(m_motor_neo1);
+      encoder2 = getEnc.invoke(m_motor_neo2);
+      encoder3 = getEnc.invoke(m_motor_neo3);
+      encoder4 = getEnc.invoke(m_motor_neo4);
+
+      Method setPos = encoder1.getClass().getMethod("setPosition", double.class);
+      setPos.invoke(encoder1, 0.0);
+      setPos.invoke(encoder2, 0.0);
+      setPos.invoke(encoder3, 0.0);
+      setPos.invoke(encoder4, 0.0);
+    } catch (Exception e) {
+      System.out.println("Warning: encoders not available via getEncoder(): " + e.getMessage());
+      encoder1 = encoder2 = encoder3 = encoder4 = null;
+    }
+  }
+
+  @Override
+  public void periodic() {
+
+    try {
+      if (encoder1 != null) {
+        Method getPos = encoder1.getClass().getMethod("getPosition");
+        double p1 = ((Number) getPos.invoke(encoder1)).doubleValue();
+        double p2 = ((Number) getPos.invoke(encoder2)).doubleValue();
+        double p3 = ((Number) getPos.invoke(encoder3)).doubleValue();
+        double p4 = ((Number) getPos.invoke(encoder4)).doubleValue();
+
+        SmartDashboard.putNumber("Drive/Encoder1_Position", p1);
+        SmartDashboard.putNumber("Drive/Encoder2_Position", p2);
+        SmartDashboard.putNumber("Drive/Encoder3_Position", p3);
+        SmartDashboard.putNumber("Drive/Encoder4_Position", p4);
+
+        double leftAvg = (p1 + p2) / 2.0;
+        double rightAvg = (p3 + p4) / 2.0;
+        SmartDashboard.putNumber("Drive/Left_Avg_Position", leftAvg);
+        SmartDashboard.putNumber("Drive/Right_Avg_Position", rightAvg);
+      }
+    } catch (Exception e) {
+      
+      System.out.println("Warning: failed to read encoder positions: " + e.getMessage());
+    }
   }
 
   

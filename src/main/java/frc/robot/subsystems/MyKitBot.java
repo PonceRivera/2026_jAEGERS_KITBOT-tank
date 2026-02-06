@@ -12,8 +12,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 public class MyKitBot extends SubsystemBase {
     private SparkMax m_Disparo;
     private SparkMax m_Take;
-//      private static final int kCanID_neo6 = 6;
-//   private static final int kCanID_neo5 = 5;
     private static final  MotorType kMotorType_neo = MotorType.kBrushless;
     private SparkMaxConfig disparoConfig = new SparkMaxConfig();
     private SparkMaxConfig takeConfig = new SparkMaxConfig();
@@ -48,12 +46,11 @@ public class MyKitBot extends SubsystemBase {
      *    - Ten en cuenta que esto cambia la configuración del controlador
      *      y afectará a todas las llamadas `set(...)`.
      */
-    
 
    public Command Disparo() {
         return runEnd(() -> {
-            m_Disparo.set(1);
-            m_Take.set(0.7);
+            m_Disparo.set(-1);
+            m_Take.set(-0.7);
         }, () -> {
             m_Disparo.set(0);
             m_Take.set(0);
@@ -67,6 +64,7 @@ public class MyKitBot extends SubsystemBase {
     });
 }
 
+
 public Command TakeOFF() {
     return runOnce(() -> {
         m_Take.set(0.0);  
@@ -76,8 +74,8 @@ public Command TakeOFF() {
 public Command Take2() {
 
     return runEnd(() -> {
-        m_Take.set(-6);
-        m_Disparo.set(65);
+        m_Take.set(.7);
+        m_Disparo.set(-0.5);
     }, () -> {
         m_Take.set(0);
         m_Disparo.set(0);
@@ -86,9 +84,18 @@ public Command Take2() {
 
  public Command TakeOUT() {
     return runOnce(() -> {
-        // NOTE: motor set values are in the range -1.0 .. 1.0. Use 0.7
-        // instead of 7 which would be invalid for SparkMax set().
-        m_Take.set(0.7); 
-        m_Disparo.set(-0.65);
+        m_Take.set(-0.7); 
+        m_Disparo.set(0.65);
     });
+
+
+}
+public Command Disparodelay() {
+        return runEnd(() -> {
+            m_Disparo.set(-1);
+            m_Take.set(-0.7);
+        }, () -> {
+            m_Disparo.set(0);
+            m_Take.set(0);
+        });
 }}

@@ -32,7 +32,7 @@ public class CANDriveSubsystem extends SubsystemBase {
   private final SparkMax m_motor_neo2 = new SparkMax(kCanID_neo2, kMotorType_neo);
   private final SparkMax m_motor_neo3 = new SparkMax(kCanID_neo3, kMotorType_neo);
   private final SparkMax m_motor_neo4 = new SparkMax(kCanID_neo4, kMotorType_neo);
-  
+
   private Object encoder1 = null;
   private Object encoder2 = null;
   private Object encoder3 = null;

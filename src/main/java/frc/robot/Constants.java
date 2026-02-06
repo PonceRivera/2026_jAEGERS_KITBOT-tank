@@ -63,12 +63,12 @@ public final class Constants {
     // Port constants for driver and operator controllers. These should match the
     // values in the Joystick tab of the Driver Station software
     public static final int DRIVER_CONTROLLER_PORT = 0;
-    public static final int OPERATOR_CONTROLLER_PORT = 1;
+    public static final int OPERATOR_CONTROLLER_PORT = 0;
 
     // This value is multiplied by the joystick value when driving the robot to
     // help avoid driving and turning too fast and being difficult to control
-    public static final double DRIVE_SCALING = 0.6;
-    public static final double ROTATION_SCALING = 1;
+    public static final double DRIVE_SCALING = 0;
+    public static final double ROTATION_SCALING = 0;
     // Open-loop turn parameters for a 180° turn when no gyro is available.
     // These are approximate and should be tuned on the robot. TURN_180_SPEED is
     // the rotation input (0..1) applied during the turn; TURN_180_TIME is the

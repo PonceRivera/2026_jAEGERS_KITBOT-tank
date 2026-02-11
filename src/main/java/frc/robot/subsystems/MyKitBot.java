@@ -179,6 +179,26 @@ public class MyKitBot extends SubsystemBase {
         });
     }
 
+    public Command DisparDelayAuto() {
+        return runEnd(() -> {
+            m_Disparo.set(-0.7);
+
+            if (!spinUpTimer.isRunning()) {
+                spinUpTimer.reset();
+                spinUpTimer.start();
+            }
+
+            if (spinUpTimer.hasElapsed(1)) {
+                m_Take.set(-1);
+            }
+        }, () -> {
+            m_Disparo.set(0);
+            m_Take.set(0);
+            spinUpTimer.stop();
+            spinUpTimer.reset();
+        });
+    }
+
     public Command TakeOFF() {
         return runOnce(() -> {
             m_Take.set(0.0);

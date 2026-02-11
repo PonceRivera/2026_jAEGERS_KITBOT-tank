@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import static frc.robot.Constants.OperatorConstants.*;
+import frc.robot.commands.Autos;
 
 import frc.robot.subsystems.CANDriveSubsystem;
 import frc.robot.subsystems.MyKitBot;
@@ -39,21 +40,27 @@ public class RobotContainer {
         true,
         driveSubsystem);
 
+    // EVENT MARKERS
+    autoFactory.bind("disparar", myKitBot.DisparDelay());
+    autoFactory.bind("tomar", myKitBot.Take2());
+    autoFactory.bind("parar", myKitBot.TakeOFF());
+    autoFactory.bind("sacar", myKitBot.TakeOUT());
+
     autoChooser.setDefaultOption("Do Nothing", new InstantCommand());
 
-    // Auto2: sigue la trayectoria generada en Choreo
     autoChooser.addOption(
-        "Auto2",
+        "Auto 1",
         Commands.sequence(
-            autoFactory.resetOdometry("Auto2"),
-            autoFactory.trajectoryCmd("Auto2")));
+            autoFactory.resetOdometry("MedioDisparo"),
+            autoFactory.trajectoryCmd("DisparoApelotas"),
+            autoFactory.trajectoryCmd("PelotasAdisparo"),
+            autoFactory.trajectoryCmd("DisparoAneutral")));
 
-    // Auto1: NO tiene .traj generado todavía — genera la trayectoria en Choreo
-    // primero
-    // autoChooser.addOption("Auto1", Commands.sequence(
-    // autoFactory.resetOdometry("Auto1"),
-    // autoFactory.trajectoryCmd("Auto1")
-    // ));
+    // Auto 2: simple por tiempos (retrocede + dispara)
+    autoChooser.addOption("Auto 2", Autos.autoTiempos(driveSubsystem, myKitBot));
+
+    // Auto 3: secuencia completa por tiempos (replica Choreo sin trayectorias)
+    autoChooser.addOption("Auto 3", Autos.auto1Tiempos(driveSubsystem, myKitBot));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -79,21 +86,25 @@ public class RobotContainer {
         driveSubsystem.driveArcade(
 
             () -> {
+              // MAX_SPEED: ajusta este valor para limitar la velocidad máxima (0.0 a 1.0)
+              final double MAX_SPEED = 0.70; // 70% de velocidad máxima
               double throttle = (1 - driverJoystick.getRawAxis(3)) / 2.0;
 
               double forward = MathUtil.applyDeadband(driverJoystick.getY(), 0.08);
               forward = Math.copySign(forward * forward, forward);
 
-              return -forward * throttle;
+              return -forward * throttle * MAX_SPEED;
             },
 
             () -> {
+              // más bajo que la velocidad para evitar brownouts al girar
+              final double MAX_TURN_SPEED = 0.55;
               double throttle = (1 - driverJoystick.getRawAxis(3)) / 2.0;
 
               double rotation = MathUtil.applyDeadband(driverJoystick.getZ(), 0.08);
               rotation = Math.copySign(rotation * rotation, rotation);
 
-              return rotation * throttle;
+              return rotation * throttle * MAX_TURN_SPEED;
             }));
   }
 

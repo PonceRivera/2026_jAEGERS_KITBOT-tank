@@ -1,5 +1,5 @@
 {
- "name":"Auto2",
+ "name":"MedioDisparo",
  "version":2,
  "type":"Differential",
  "variables":{
@@ -40,8 +40,8 @@
    "val":6.5
   },
   "radius":{
-   "exp":"2 in",
-   "val":0.0508
+   "exp":"6 in",
+   "val":0.15239999999999998
   },
   "vmax":{
    "exp":"6000 RPM",
@@ -57,16 +57,16 @@
   },
   "bumper":{
    "front":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"33 in",
+    "val":0.8382
    },
    "side":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"38 in",
+    "val":0.9652
    },
    "back":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"33 in",
+    "val":0.8382
    }
   },
   "differentialTrackWidth":{
@@ -76,7 +76,7 @@
  },
  "generationFeatures":[],
  "codegen":{
-  "root":null,
+  "root":"..\\C:\\Users\\Crist\\Desktop\\2026_kp\\Kitbot prueba 2\\src\\main\\deploy\\choreo",
   "genVars":true,
   "genTrajData":true,
   "useChoreoLib":true

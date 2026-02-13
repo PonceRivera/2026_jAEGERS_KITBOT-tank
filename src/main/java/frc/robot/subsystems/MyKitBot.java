@@ -86,7 +86,7 @@ public class MyKitBot extends SubsystemBase {
 
     public Command DisparDelayAuto() {
         return runEnd(() -> {
-            m_Disparo.set(-0.7);
+            m_Disparo.set(-0.6);
 
             if (!spinUpTimer.isRunning()) {
                 spinUpTimer.reset();

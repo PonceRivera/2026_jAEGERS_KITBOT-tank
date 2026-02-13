@@ -34,10 +34,8 @@ public final class Autos {
         // ===== MedioDisparo (1.74s total) =====
         // Retroceder recto ~0.92m hacia la zona de disparo
         drive.driveArcade(() -> -0.35, () -> 0.0).withTimeout(1.7),
-        // Frenar
         drive.driveArcade(() -> 0.0, () -> 0.0).withTimeout(0.2),
 
-        // ===== evento "disparar" de MedioDisparo =====
         kit.DisparDelayAuto().withTimeout(5),
         kit.TakeOFF(),
 
@@ -48,8 +46,7 @@ public final class Autos {
         drive.driveArcade(() -> 0.45, () -> 0.0).withTimeout(2.3),
         // 3: Girar ~90° más a la izquierda (heading 90° → 0°)
         drive.driveArcade(() -> 0.0, () -> -0.45).withTimeout(1.2),
-        // 4: Avanzar recto hacia las pelotas MIENTRAS recoge (drive + Take2 en
-        // paralelo)
+
         Commands.parallel(
             drive.driveArcade(() -> 0.35, () -> 0.0),
             kit.Take2()).withTimeout(3),

@@ -12,8 +12,8 @@ public final class Constants {
     public static final int DRIVE_MOTOR_CURRENT_LIMIT = 60;
 
     // ===== CHOREO / ODOMETRY =====
-    public static final double WHEEL_DIAMETER_METERS = 0.1524; // 6 pulgadas
-    public static final double GEAR_RATIO = 10.71; // típico kitbot
+    public static final double WHEEL_DIAMETER_METERS = 0.1524; // 6 pulgadas DIÁMETRO (PathPlanner usa radio = 0.0762)
+    public static final double GEAR_RATIO = 6.5; // debe coincidir con Choreo (Motor Rev/Wheel Rev)
     public static final double TRACK_WIDTH_METERS = 0.6;
 
     public static final double ENCODER_POSITION_CONVERSION = (Math.PI * WHEEL_DIAMETER_METERS) / GEAR_RATIO;

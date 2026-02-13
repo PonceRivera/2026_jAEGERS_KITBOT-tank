@@ -1,0 +1,91 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Salida"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "disparar"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Hub A Pelotas"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Tomar Pelotas"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Pelotas A disparo"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "disparar"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "parar"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Disparo a Neutral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "neutral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "tomar neutral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "neutral a Field"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Neutral disparo"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "disparar"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

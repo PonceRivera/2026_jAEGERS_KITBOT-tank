@@ -1,6 +1,7 @@
 package frc.robot;
 
-import choreo.auto.AutoFactory;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
@@ -24,37 +25,22 @@ public class RobotContainer {
 
   private final Joystick driverJoystick = new Joystick(DRIVER_CONTROLLER_PORT);
 
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-
-  private final AutoFactory autoFactory;
+  private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
 
     configureBindings();
 
-    // AutoFactory para Choreo — usa followTrajectory que acepta DifferentialSample
-    autoFactory = new AutoFactory(
-        driveSubsystem::getPose,
-        driveSubsystem::resetPose,
-        driveSubsystem::followTrajectory,
-        true,
-        driveSubsystem);
+    // ===== PATH PLANNER: Named Commands =====
+    // Registrar comandos para usar en los autos de PathPlanner
+    NamedCommands.registerCommand("disparar", myKitBot.DisparDelayAuto().withTimeout(5));
+    NamedCommands.registerCommand("tomar", myKitBot.Take2().withTimeout(3));
+    NamedCommands.registerCommand("parar", myKitBot.TakeOFF());
+    NamedCommands.registerCommand("sacar", myKitBot.TakeOUT());
 
-    // EVENT MARKERS
-    autoFactory.bind("disparar", myKitBot.DisparDelay());
-    autoFactory.bind("tomar", myKitBot.Take2());
-    autoFactory.bind("parar", myKitBot.TakeOFF());
-    autoFactory.bind("sacar", myKitBot.TakeOUT());
-
-    autoChooser.setDefaultOption("Do Nothing", new InstantCommand());
-
-    autoChooser.addOption(
-        "Auto 1",
-        Commands.sequence(
-            autoFactory.resetOdometry("MedioDisparo"),
-            autoFactory.trajectoryCmd("DisparoApelotas"),
-            autoFactory.trajectoryCmd("PelotasAdisparo"),
-            autoFactory.trajectoryCmd("DisparoAneutral")));
+    // ===== AUTO CHOOSER =====
+    // Usa AutoBuilder para construir el chooser con todos los autos de PathPlanner
+    autoChooser = AutoBuilder.buildAutoChooser();
 
     // Auto 2: simple por tiempos (retrocede + dispara)
     autoChooser.addOption("Auto 2", Autos.autoTiempos(driveSubsystem, myKitBot));
@@ -87,7 +73,7 @@ public class RobotContainer {
 
             () -> {
               // MAX_SPEED: ajusta este valor para limitar la velocidad máxima (0.0 a 1.0)
-              final double MAX_SPEED = 0.70; // 70% de velocidad máxima
+              final double MAX_SPEED = 1; // 70% de velocidad máxima
               double throttle = (1 - driverJoystick.getRawAxis(3)) / 2.0;
 
               double forward = MathUtil.applyDeadband(driverJoystick.getY(), 0.08);
@@ -98,7 +84,7 @@ public class RobotContainer {
 
             () -> {
               // más bajo que la velocidad para evitar brownouts al girar
-              final double MAX_TURN_SPEED = 0.55;
+              final double MAX_TURN_SPEED = 0.70;
               double throttle = (1 - driverJoystick.getRawAxis(3)) / 2.0;
 
               double rotation = MathUtil.applyDeadband(driverJoystick.getZ(), 0.08);

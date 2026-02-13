@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.271193181818181,
+        "y": 4.065920454545455
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.718624893378316,
+        "y": 3.7754566294577705
+      },
+      "isLocked": false,
+      "linkedName": "Salida"
+    },
+    {
+      "anchor": {
+        "x": 0.5914204545454544,
+        "y": 7.116738636363636
+      },
+      "prevControl": {
+        "x": 1.4468863636363634,
+        "y": 7.2095
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "PosPelotas"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Auto 001 paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

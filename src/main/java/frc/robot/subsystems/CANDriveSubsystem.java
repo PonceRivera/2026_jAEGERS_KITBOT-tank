@@ -2,6 +2,9 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPLTVController;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -10,12 +13,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
-import choreo.trajectory.DifferentialSample;
-
-import edu.wpi.first.math.controller.LTVUnicycleController;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -41,9 +42,6 @@ public class CANDriveSubsystem extends SubsystemBase {
   private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading(), 0, 0);
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_motor_neo1, m_motor_neo3);
-
-  // Controlador para seguimiento de trayectorias diferenciales (Choreo)
-  private final LTVUnicycleController trajectoryController = new LTVUnicycleController(0.02);
 
   public CANDriveSubsystem() {
 
@@ -78,6 +76,28 @@ public class CANDriveSubsystem extends SubsystemBase {
     rightEncoder.setPosition(0);
 
     m_drive.setSafetyEnabled(false);
+
+    // ===== PATH PLANNER =====
+    // Cargar config del robot desde la GUI de PathPlanner (settings)
+    try {
+      RobotConfig config = RobotConfig.fromGUISettings();
+
+      AutoBuilder.configure(
+          this::getPose,
+          this::resetPose,
+          this::getRobotRelativeSpeeds,
+          this::driveChassisSpeeds,
+          new PPLTVController(0.02),
+          config,
+          // Voltear paths para alianza roja
+          () -> {
+            var alliance = DriverStation.getAlliance();
+            return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+          },
+          this);
+    } catch (Exception e) {
+      DriverStation.reportError("Error configurando PathPlanner: " + e.getMessage(), e.getStackTrace());
+    }
   }
 
   @Override
@@ -102,7 +122,7 @@ public class CANDriveSubsystem extends SubsystemBase {
     return Commands.run(() -> arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()), this);
   }
 
-  /* ================= CHOREO 2026 ================= */
+  /* ================= ODOMETRY / PATH PLANNER ================= */
 
   public Pose2d getPose() {
     return odometry.getPoseMeters();
@@ -116,25 +136,13 @@ public class CANDriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Sigue una muestra de trayectoria diferencial de Choreo.
-   * Usa LTVUnicycleController para feedback y convierte a wheel speeds.
+   * Devuelve las velocidades actuales del robot relativas al robot.
+   * Requerido por PathPlanner AutoBuilder.
    */
-  public void followTrajectory(DifferentialSample sample) {
-    // Pose actual del robot
-    Pose2d pose = getPose();
-
-    // Velocidades feedforward de la trayectoria
-    ChassisSpeeds ff = sample.getChassisSpeeds();
-
-    // Calcular velocidades corregidas con feedback del controlador
-    ChassisSpeeds speeds = trajectoryController.calculate(
-        pose,
-        sample.getPose(),
-        ff.vxMetersPerSecond,
-        ff.omegaRadiansPerSecond);
-
-    // Aplicar velocidades al drivetrain
-    driveChassisSpeeds(speeds);
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return kinematics.toChassisSpeeds(new DifferentialDriveWheelSpeeds(
+        leftEncoder.getVelocity(),
+        rightEncoder.getVelocity()));
   }
 
   /**

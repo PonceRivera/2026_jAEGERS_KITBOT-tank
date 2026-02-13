@@ -1,0 +1,66 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.5914204545454544,
+        "y": 7.116738636363636
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 0.47296149353796924,
+        "y": 6.6353883156551525
+      },
+      "isLocked": false,
+      "linkedName": "PosPelotas"
+    },
+    {
+      "anchor": {
+        "x": 0.5089659090909089,
+        "y": 4.962613636363637
+      },
+      "prevControl": {
+        "x": 0.5938505909004343,
+        "y": 5.309679485281824
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "tomarPelotas"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "tomar",
+      "waypointRelativePos": 0.03,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "tomar"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Auto 001 paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
